@@ -12,7 +12,7 @@ public class Libro {
     private Long id;
     private int idLibro;
     private String nombre;
-    @OneToOne(mappedBy = "libro", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "libro", cascade = CascadeType.ALL)
     private Autor autor;
     private List<String> lenguaje;
 
@@ -23,6 +23,17 @@ public class Libro {
         this.idLibro = libro.idLibro();
         this.nombre = libro.nombre();
         this.lenguaje = libro.lenguaje();
+    }
+
+    @Override
+    public String toString() {
+        return "Libro{" +
+                "id=" + id +
+                ", idLibro=" + idLibro +
+                ", nombre='" + nombre + '\'' +
+                ", autor=" + autor +
+                ", lenguaje=" + lenguaje +
+                '}';
     }
 
     public Long getId() {

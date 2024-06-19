@@ -70,6 +70,10 @@ public class CodigoPrincipal {
     }
 
 
+    private List<Autor> tomarDatosAutores(){
+        List<Autor> datosAutoresRegistrados = repository.autoresRegistradosBaseDeDatos();
+        return datosAutoresRegistrados;
+    }
 
     private void buscarLibroPorTitulo() throws JsonMappingException, JsonProcessingException {
         System.out.println("Escriba el nombre del libro que desea buscar");
@@ -81,18 +85,9 @@ public class CodigoPrincipal {
         DatosAutor datosAutor = datosLibro.autor().get(0);
         System.out.println(datosAutor);
         Libro libroAGuardar = new Libro(datosLibro);
+        Autor autor = new Autor(datosAutor, libroAGuardar);
+        libroAGuardar.setAutor(autor);
         repository.save(libroAGuardar);
-        List<DatosAutor>datosAutorList = datosLibro.autor();
-        librosRegistrados();
-        Optional<Libro> libro = libros.stream()
-                .filter(s->s.getNombre().contains(libroABuscar))
-                .findFirst();
-        var libroEncontrado = libro.get();
-
-        Autor listaDatosParaClaseAutor = new Autor(datosAutor);
-        libroEncontrado.setAutor(listaDatosParaClaseAutor);
-        System.out.println(datosLibro);
-
     }
 
     private void librosRegistrados() {
@@ -102,10 +97,20 @@ public class CodigoPrincipal {
     }
 
     private void autoresRegistrados() {
-
+        tomarDatosAutores().forEach(e-> System.out.println("Nombre Autor: " + e.getNombre()+"\n"));
     }
 
     private void autoresVivosEnDeterminadoAno() {
+        System.out.println("Escribe el año en el que crees que estaba vivo el autor: ");
+        var anoProbableDeVidaAutor = scanner.nextInt();
+
+        tomarDatosAutores().forEach(e-> {
+            if (anoProbableDeVidaAutor >= e.getAnoDeNacimiento() && e.getAnoDeMuerte() > anoProbableDeVidaAutor ) {
+                System.out.println("El compa estaba vivo: "+ e.getNombre());
+            }else {
+                System.out.println("En ese entonces no estaba vivo");
+            }
+        });
 
     }
 

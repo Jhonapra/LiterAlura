@@ -12,16 +12,27 @@ public class Autor {
     String nombre;
     int anoDeNacimiento;
     int anoDeMuerte;
-    @OneToOne(mappedBy = "Autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne
+    @JoinColumn(name = "id_libro")
     private Libro libro;
 
     //Un constructor predeterminado para que lo pueda ejecutar spring correctamente
     public Autor(){}
 
-    public Autor(DatosAutor datosAutor) {
-        this.nombre = nombre;
-        this.anoDeNacimiento = anoDeNacimiento;
-        this.anoDeMuerte = anoDeMuerte;
+    public Autor(DatosAutor datosAutor, Libro libro) {
+        this.nombre = datosAutor.nombre();
+        this.anoDeNacimiento = datosAutor.anoDeNacimiento();
+        this.anoDeMuerte = datosAutor.anoDeMuerte();
+        this.libro = libro;
+
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", anoDeNacimiento=" + anoDeNacimiento +
+                ", anoDeMuerte=" + anoDeMuerte;
     }
 
     public String getNombre() {
@@ -46,5 +57,21 @@ public class Autor {
 
     public void setAnoDeMuerte(int anoDeMuerte) {
         this.anoDeMuerte = anoDeMuerte;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Libro getLibro() {
+        return libro;
+    }
+
+    public void setLibro(Libro libro) {
+        this.libro = libro;
     }
 }
