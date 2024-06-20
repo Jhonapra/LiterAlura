@@ -16,6 +16,7 @@ public class CodigoPrincipal {
     private String URL_BASE = "https://gutendex.com/books/";
     private LibroRepository repository;
     private List<Libro> libros;
+    private List<String> lenguaje;
 
     public CodigoPrincipal(LibroRepository repository){
         this.repository = repository;
@@ -54,7 +55,7 @@ public class CodigoPrincipal {
                     break;
 
                 case 5:
-                    librosPorIdioma();
+                    muestraElMenuIdiomas();
                     break;
 
                 
@@ -68,6 +69,54 @@ public class CodigoPrincipal {
         }
 
     }
+
+    public void muestraElMenuIdiomas() throws JsonProcessingException {
+        var opcion = -1;
+        while (opcion != 0) {
+            var menu = """
+                    1. es- Español
+                    2. fr- Frances
+                    3. en- Ingles
+                    4. pt- portugues
+                                  
+                    0 - Salir
+                    """;
+            System.out.println(menu);
+            opcion = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcion) {
+                case 1:
+                    lenguaje = new ArrayList<>(Arrays.asList("es"));
+                    buscarLibrosPorIdioma();
+                    break;
+                case 2:
+                    lenguaje = new ArrayList<>(Arrays.asList("fr"));
+                    buscarLibrosPorIdioma();
+                    break;
+
+                case 3:
+                    lenguaje = new ArrayList<>(Arrays.asList("en"));
+                    buscarLibrosPorIdioma();
+                    break;
+
+                case 4:
+                    lenguaje = new ArrayList<>(Arrays.asList("pt"));
+                    buscarLibrosPorIdioma();
+                    break;
+
+
+                case 0:
+                    System.out.println("Cerrando la aplicación...");
+                    break;
+                default:
+                    System.out.println("Opción inválida");
+            }
+        }
+
+    }
+
+
 
 
     private List<Autor> tomarDatosAutores(){
@@ -114,7 +163,9 @@ public class CodigoPrincipal {
 
     }
 
-    private void librosPorIdioma() {
+    private void buscarLibrosPorIdioma() throws JsonProcessingException {
+        List<Libro>librosFlijtradosPorIdioma = repository.librosPorLenguaje(lenguaje);
+        System.out.println(librosFlijtradosPorIdioma);
 
     }
 
