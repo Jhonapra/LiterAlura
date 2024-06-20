@@ -17,6 +17,16 @@ public class CodigoPrincipal {
     private LibroRepository repository;
     private List<Libro> libros;
     private List<String> lenguaje;
+    private String MODELO_IMPRESION_LIBROS ="""
+                ******************************
+                %s
+                ------------------------------ 
+                Autor: %s
+                Idioma: %s
+                Cantidad de descargas: %s
+                ------------------------------
+                ******************************
+                """;
 
     public CodigoPrincipal(LibroRepository repository){
         this.repository = repository;
@@ -58,8 +68,6 @@ public class CodigoPrincipal {
                     muestraElMenuIdiomas();
                     break;
 
-                
-
                 case 0:
                     System.out.println("Cerrando la aplicación...");
                     break;
@@ -74,10 +82,12 @@ public class CodigoPrincipal {
         var opcion = -1;
         while (opcion != 0) {
             var menu = """
-                    1. es- Español
-                    2. fr- Frances
-                    3. en- Ingles
-                    4. pt- portugues
+                    ***Ingrese el numero del idioma que quiere los libros***
+                    
+                    1. Español
+                    2. Frances
+                    3. Ingles
+                    4. Portugues
                                   
                     0 - Salir
                     """;
@@ -117,7 +127,14 @@ public class CodigoPrincipal {
     }
 
 
+    private List<String> pruebaLibrosAutor(String nombreDelAutor){
+        List<Libro> prueba = repository.librosAutor(nombreDelAutor);
+        List<String> librosAutor = new ArrayList<>();
+        prueba.stream().forEach(e->librosAutor.add(e.getNombre()));
+        System.out.println(librosAutor);
+        return librosAutor;
 
+    }
 
     private List<Autor> tomarDatosAutores(){
         List<Autor> datosAutoresRegistrados = repository.autoresRegistradosBaseDeDatos();
@@ -132,40 +149,52 @@ public class CodigoPrincipal {
         ResultadosLibro resultadosLibro = transformarDatosAClase.obtenerDatos(json, ResultadosLibro.class);
         DatosLibro datosLibro = resultadosLibro.datosLibro().get(0);
         DatosAutor datosAutor = datosLibro.autor().get(0);
-        System.out.println(datosAutor);
         Libro libroAGuardar = new Libro(datosLibro);
         Autor autor = new Autor(datosAutor, libroAGuardar);
         libroAGuardar.setAutor(autor);
         repository.save(libroAGuardar);
+        System.out.printf(MODELO_IMPRESION_LIBROS, datosLibro.nombre(),
+                datosAutor.nombre(), datosLibro.lenguaje(), datosLibro.descargas());
     }
 
     private void librosRegistrados() {
         libros = repository.findAll();
         libros.stream().sorted(Comparator.comparing(Libro::getIdLibro)).
-                forEach(System.out::println);
+                forEach(e-> System.out.printf(MODELO_IMPRESION_LIBROS, e.getNombre(), e.getAutor().getNombre(),
+                        e.getLenguaje(), e.getDescargas()));
     }
 
     private void autoresRegistrados() {
-        tomarDatosAutores().forEach(e-> System.out.println("Nombre Autor: " + e.getNombre()+"\n"));
+        tomarDatosAutores().forEach(e-> System.out.printf("""
+                *****************************
+                Autor:%s
+                Fecha de nacimiento:%d
+                Fecha de fallecimiento:%d
+                Libros: %s
+                *****************************
+                """, e.getNombre(), e.getAnoDeNacimiento(), e.getAnoDeMuerte(), pruebaLibrosAutor(e.getNombre())));
     }
 
     private void autoresVivosEnDeterminadoAno() {
         System.out.println("Escribe el año en el que crees que estaba vivo el autor: ");
         var anoProbableDeVidaAutor = scanner.nextInt();
 
-        tomarDatosAutores().forEach(e-> {
-            if (anoProbableDeVidaAutor >= e.getAnoDeNacimiento() && e.getAnoDeMuerte() > anoProbableDeVidaAutor ) {
-                System.out.println("El compa estaba vivo: "+ e.getNombre());
-            }else {
-                System.out.println("En ese entonces no estaba vivo");
-            }
-        });
+        List<Autor>autoresVivos = repository.autoresVivos(anoProbableDeVidaAutor);
+        autoresVivos.stream().forEach(e-> System.out.printf("""
+                *****************************
+                Autor:%s
+                Fecha de nacimiento:%d
+                Fecha de fallecimiento:%d
+                Libros: %s
+                *****************************
+                """, e.getNombre(), e.getAnoDeNacimiento(), e.getAnoDeMuerte(), pruebaLibrosAutor(e.getNombre())));
 
     }
 
     private void buscarLibrosPorIdioma() throws JsonProcessingException {
         List<Libro>librosFlijtradosPorIdioma = repository.librosPorLenguaje(lenguaje);
-        System.out.println(librosFlijtradosPorIdioma);
+        librosFlijtradosPorIdioma.stream().forEach(e-> System.out.printf(MODELO_IMPRESION_LIBROS, e.getNombre(),
+                e.getAutor().getNombre(), e.getLenguaje(), e.getDescargas()));
 
     }
 

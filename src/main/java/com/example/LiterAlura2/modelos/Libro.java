@@ -10,6 +10,7 @@ public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private int descargas;
     private int idLibro;
     private String nombre;
     @OneToOne(mappedBy = "libro", cascade = CascadeType.ALL)
@@ -20,6 +21,7 @@ public class Libro {
     public Libro(){}
 
     public Libro(DatosLibro libro) {
+        this.descargas = libro.descargas();
         this.idLibro = libro.idLibro();
         this.nombre = libro.nombre();
         this.lenguaje = libro.lenguaje();
@@ -75,5 +77,13 @@ public class Libro {
 
     public void setLenguaje(List<String> lenguaje) {
         this.lenguaje = lenguaje;
+    }
+
+    public int getDescargas() {
+        return descargas;
+    }
+
+    public void setDescargas(int descargas) {
+        this.descargas = descargas;
     }
 }

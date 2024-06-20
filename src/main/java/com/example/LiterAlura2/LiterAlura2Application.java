@@ -2,7 +2,6 @@ package com.example.LiterAlura2;
 
 import com.example.LiterAlura2.principal.CodigoPrincipal;
 import com.example.LiterAlura2.repositori.LibroRepository;
-import com.example.LiterAlura2.service.ITransformarDatosAClase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
