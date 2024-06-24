@@ -25,14 +25,14 @@ public class CodigoPrincipal {
                 Idioma: %s
                 Cantidad de descargas: %s
                 ------------------------------
-                ******************************
+                ******************************\n
                 """;
     private String ERROR_NUMERO_INVALIDO= """
                         **********************ERROR***************************
                                ||Recuerda ingresar un numero valido||
                         
                         -Los numeros validos se encuentran en la tabla.
-                        ******************************************************
+                        ******************************************************\n
                         """;
 
     public CodigoPrincipal(LibroRepository repository){
@@ -88,7 +88,7 @@ public class CodigoPrincipal {
                     System.out.println("Cerrando la aplicación...");
                     break;
                 default:
-                    System.out.println("Opción inválida");
+                    System.out.println("||Opción inválida||");
             }
             if (opcionMenu != 0){
                 opcionMenu=-1;
@@ -149,7 +149,7 @@ public class CodigoPrincipal {
                     System.out.println("Cerrando la aplicación...");
                     break;
                 default:
-                    System.out.println("Opción inválida");
+                    System.out.println("||Opción inválida||");
             }
             if (opcion != 0){
                 opcion=-1;
@@ -165,7 +165,6 @@ public class CodigoPrincipal {
         List<Libro> prueba = repository.librosAutor(nombreDelAutor);
         List<String> librosAutor = new ArrayList<>();
         prueba.stream().forEach(e->librosAutor.add(e.getNombre()));
-        System.out.println(librosAutor);
         return librosAutor;
 
     }
@@ -178,7 +177,7 @@ public class CodigoPrincipal {
                 Fecha de nacimiento:%d
                 Fecha de fallecimiento:%d
                 Libros: %s
-                *****************************
+                *****************************\n
                 """, e.getNombre(), e.getAnoDeNacimiento(), e.getAnoDeMuerte(), pruebaLibrosAutor(e.getNombre())));
     }
 
@@ -187,20 +186,41 @@ public class CodigoPrincipal {
         return datosAutoresRegistrados;
     }
 
+
     private void buscarLibroPorTitulo() throws JsonMappingException, JsonProcessingException {
         System.out.println("Escriba el nombre del libro que desea buscar");
         var libroABuscar = scanner.nextLine();
         var json = obtenerJsonApi.obtenerDatos(URL_BASE + "?search="+libroABuscar.
                 replace(" ","%20"));
         ResultadosLibro resultadosLibro = transformarDatosAClase.obtenerDatos(json, ResultadosLibro.class);
-        DatosLibro datosLibro = resultadosLibro.datosLibro().get(0);
-        DatosAutor datosAutor = datosLibro.autor().get(0);
-        Libro libroAGuardar = new Libro(datosLibro);
-        Autor autor = new Autor(datosAutor, libroAGuardar);
-        libroAGuardar.setAutor(autor);
-        repository.save(libroAGuardar);
-        System.out.printf(MODELO_IMPRESION_LIBROS, datosLibro.nombre(),
-                datosAutor.nombre(), datosLibro.lenguaje(), datosLibro.descargas());
+        libros = repository.findAll();
+        Optional<Libro>libro= libros.stream()
+                .filter(s->s.getNombre().toLowerCase().contains(libroABuscar.toLowerCase()))
+                .findFirst();
+        if (resultadosLibro.cantidadResultados()==0){
+            System.out.println("""
+                    ***********************************
+                    No se encontraron resultados
+                    ***********************************\n""");
+
+        }else if (libro.isPresent()){
+            System.out.println("""
+                    ***************************************
+                    El libro ya esta en la base de datos
+                    ***************************************\n""");
+
+        }else {
+            DatosLibro datosLibro = resultadosLibro.datosLibro().get(0);
+            DatosAutor datosAutor = datosLibro.autor().get(0);
+            Libro libroAGuardar = new Libro(datosLibro);
+            Autor autor = new Autor(datosAutor, libroAGuardar);
+            libroAGuardar.setAutor(autor);
+            repository.save(libroAGuardar);
+            System.out.printf(MODELO_IMPRESION_LIBROS, datosLibro.nombre(),
+                    datosAutor.nombre(), datosLibro.lenguaje(), datosLibro.descargas());
+
+        }
+
     }
 
     private void librosRegistrados() {
