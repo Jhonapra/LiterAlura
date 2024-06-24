@@ -27,14 +27,21 @@ public class CodigoPrincipal {
                 ------------------------------
                 ******************************
                 """;
+    private String ERROR_NUMERO_INVALIDO= """
+                        **********************ERROR***************************
+                               ||Recuerda ingresar un numero valido||
+                        
+                        -Los numeros validos se encuentran en la tabla.
+                        ******************************************************
+                        """;
 
     public CodigoPrincipal(LibroRepository repository){
         this.repository = repository;
     }
 
     public void muestraElMenu() throws JsonProcessingException {
-        var opcion = -1;
-        while (opcion != 0) {
+        var opcionMenu = -1;
+        while (opcionMenu != 0) {
             var menu = """
                     1 - Buscar libro por titulo
                     2 - Mostrar lista de libros registrados
@@ -45,10 +52,19 @@ public class CodigoPrincipal {
                     0 - Salir
                     """;
             System.out.println(menu);
-            opcion = scanner.nextInt();
-            scanner.nextLine();
 
-            switch (opcion) {
+            try{
+                opcionMenu = scanner.nextInt();
+                scanner.nextLine();
+
+            }catch (Exception e){
+                System.out.println(ERROR_NUMERO_INVALIDO);
+                scanner = new Scanner(System.in);
+            }
+
+
+
+            switch (opcionMenu) {
                 case 1:
                     buscarLibroPorTitulo();
                     break;
@@ -74,9 +90,15 @@ public class CodigoPrincipal {
                 default:
                     System.out.println("Opción inválida");
             }
-        }
+            if (opcionMenu != 0){
+                opcionMenu=-1;
+            }else{
+                opcionMenu=0;
+            }
 
+        }
     }
+
 
     public void muestraElMenuIdiomas() throws JsonProcessingException {
         var opcion = -1;
@@ -92,8 +114,15 @@ public class CodigoPrincipal {
                     0 - Salir
                     """;
             System.out.println(menu);
-            opcion = scanner.nextInt();
-            scanner.nextLine();
+
+            try{
+                opcion = scanner.nextInt();
+                scanner.nextLine();
+
+            }catch (Exception e){
+                System.out.println(ERROR_NUMERO_INVALIDO);
+                scanner = new Scanner(System.in);
+            }
 
             switch (opcion) {
                 case 1:
@@ -122,6 +151,11 @@ public class CodigoPrincipal {
                 default:
                     System.out.println("Opción inválida");
             }
+            if (opcion != 0){
+                opcion=-1;
+            }else{
+                opcion=0;
+            }
         }
 
     }
@@ -134,6 +168,18 @@ public class CodigoPrincipal {
         System.out.println(librosAutor);
         return librosAutor;
 
+    }
+
+    //Imprime la ficha con los datos relevantes del autor(Requiere una lista del tipo Autor para funcionar)
+    private void imprimirModeloAutores(List<Autor> autorList){
+        autorList.stream().forEach(e-> System.out.printf("""
+                *****************************
+                Autor:%s
+                Fecha de nacimiento:%d
+                Fecha de fallecimiento:%d
+                Libros: %s
+                *****************************
+                """, e.getNombre(), e.getAnoDeNacimiento(), e.getAnoDeMuerte(), pruebaLibrosAutor(e.getNombre())));
     }
 
     private List<Autor> tomarDatosAutores(){
@@ -165,14 +211,7 @@ public class CodigoPrincipal {
     }
 
     private void autoresRegistrados() {
-        tomarDatosAutores().forEach(e-> System.out.printf("""
-                *****************************
-                Autor:%s
-                Fecha de nacimiento:%d
-                Fecha de fallecimiento:%d
-                Libros: %s
-                *****************************
-                """, e.getNombre(), e.getAnoDeNacimiento(), e.getAnoDeMuerte(), pruebaLibrosAutor(e.getNombre())));
+        imprimirModeloAutores(tomarDatosAutores());
     }
 
     private void autoresVivosEnDeterminadoAno() {
@@ -180,14 +219,7 @@ public class CodigoPrincipal {
         var anoProbableDeVidaAutor = scanner.nextInt();
 
         List<Autor>autoresVivos = repository.autoresVivos(anoProbableDeVidaAutor);
-        autoresVivos.stream().forEach(e-> System.out.printf("""
-                *****************************
-                Autor:%s
-                Fecha de nacimiento:%d
-                Fecha de fallecimiento:%d
-                Libros: %s
-                *****************************
-                """, e.getNombre(), e.getAnoDeNacimiento(), e.getAnoDeMuerte(), pruebaLibrosAutor(e.getNombre())));
+        imprimirModeloAutores(autoresVivos);
 
     }
 
